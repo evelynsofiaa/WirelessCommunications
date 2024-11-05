@@ -1,12 +1,9 @@
-// Configuración del microcontrolador
+// ConfiguraciÃ³n del microcontrolador
 #pragma config PLLDIV = 1       // PLL Prescaler Selection bits (No prescale (4 MHz oscillator input drives PLL directly))
 #pragma config CPUDIV = OSC1_PLL2 // System Clock Postscaler Selection bits ([Primary Oscillator Src: /1][96 MHz PLL Src: /2])
 #pragma config USBDIV = 1       // USB Clock Selection bit (used in Full-Speed USB mode only; UCFG:FSEN = 1) (USB clock source comes directly from the primary oscillator block with no postscale)
 
 // CONFIG1H
-#pragma config FOSC = XT_XT     // Oscillator Selection bits (XT oscillator (XT))
-#pragma config FCMEN = OFF      // Fail-Safe Clock Monitor Enable bit (Fail-Safe Clock Monitor disabled)
-#pragma config IESO = OFF       // Internal/External Oscillator Switchover bit (Oscillator Switchover mode disabled)
 
 // CONFIG2L
 #pragma config PWRT = OFF       // Power-up Timer Enable bit (PWRT disabled)
@@ -110,7 +107,7 @@ void Init_Ports() {
     TRISB = 1;      // All PORTB is INput
     TRISD =0;
     TRISA= 1;// Set RC4, RC5, RC6 as inputs (bits 4, 5, and 6 in TRISC)
-    LATB = 0x00;    // Asegurarse de que las salidas en puerto B estén apagadas
+    LATB = 0x00;    // Asegurarse de que las salidas en puerto B estÃ©n apagadas
     LATA = 0x00;    // Apagamos las salidas en puerto A
 }
 
