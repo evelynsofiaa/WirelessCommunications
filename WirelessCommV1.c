@@ -5,7 +5,7 @@
  * Created on 31 de octubre de 2024, 09:40 AM
  */
 
-// ConfiguraciÛn del microcontrolador
+// Configuraci√≥n del microcontrolador
 #pragma config PLLDIV = 1       // PLL Prescaler Selection bits (No prescale (4 MHz oscillator input drives PLL directly))
 #pragma config CPUDIV = OSC1_PLL2 // System Clock Postscaler Selection bits ([Primary Oscillator Src: /1][96 MHz PLL Src: /2])
 #pragma config USBDIV = 1       // USB Clock Selection bit (USB clock source comes directly from the primary oscillator block with no postscale)
@@ -119,7 +119,7 @@ void RFID_read() {
         while (1) {
             RxByte = RFID_Card_Byte();
             if (RxByte == StopByteRFID) {
-                // LlegÛ el fin del mensaje
+                // Lleg√≥ el fin del mensaje
                 break;
             }
             RFID_data[k++] = RxByte; // Almacenar el byte en el buffer
@@ -129,7 +129,7 @@ void RFID_read() {
             }
         }
 
-        // AÒadir un car·cter nulo al final para marcar el fin del string
+        // A√±adir un car√°cter nulo al final para marcar el fin del string
         RFID_data[k] = '\0';
 
         // Transmitir el mensaje recibido por el puerto serial
