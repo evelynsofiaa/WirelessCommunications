@@ -77,6 +77,91 @@
 
 #define StartByteRFID 0x0A           // El bit que identifica el inicio
 #define StopByteRFID  0x0D           // El bit que identifica el final
+// Constants
+#define Delay_LCD       50           // Delay used for LCD ENABLE pin
+#define Delay_Shift     50          // Delay used to shift characters 
+
+
+#define ClrScreen       0x01        // LCD clear display screen
+#define ReturnHome      0x02        // LCD return home
+#define DecCursor       0x04        // LCD decrement cursor (shift cursor to left)
+#define IncCursor       0x06        // LCD increment cursor (shift cursor to right)
+#define ShiftRight      0x05        // Shift display right
+#define ShiftLeft       0x07        // Shift display left
+#define DispOFFCurOFF   0x08        // Display OFF, cursor OFF
+#define DispOFFCurON    0x0A        // Display OFF, cursor ON
+#define DispONCurOFF    0x0C        // Display ON, cursor OFF
+#define DispONCurBk     0x0E        // Display ON cursor Blinking
+#define DispOFFCurBk    0x0F        // Display OFF cursor Blinking
+#define ShiftCurLeft    0x10        // Shift cursor position to left
+#define ShiftCurRight   0x14        // Shift cursor position to right
+#define ShiftDispLeft   0x18        // Shift entire display to the left
+#define ShiftDispRight  0x1C        // Shift entire display to the right
+#define FirstLine       0x80        // Cursor at the beginning of the first line
+#define SecondLine      0xC0        // Cursor at the beginning of the second line
+#define TwoLines57Mat   0x38        // Two lines, 5x7 matrix
+
+void Init_Ports() {
+    TRISC = 0; // Clear bits RC0, RC1, RC2 to set as output
+    TRISB = 1;      // All PORTB is INput
+    TRISD =0;
+    TRISA= 0b00000011;// Set RC4, RC5, RC6 as inputs (bits 4, 5, and 6 in TRISC)
+    LATB = 0x00;    // Asegurarse de que las salidas en puerto A estén apagadas
+}
+
+void Lcd_CmdWrite(unsigned char c) {
+    PORTD = c;           // Place ASCII character on LCD data bus
+    RS = 0;             // For sending command, RS = 0
+    RW = 0;             // RW is always grounded
+    EN = 1;             // Send the data now
+    __delay_ms(Delay_LCD); // Wait for line to stabilize
+    EN = 0;             // Ready, all sent 
+}
+
+void Lcd_DataWrite(unsigned char d) {
+    PORTD = d;           // Place ASCII character on LCD data bus
+    RS = 1;             // For sending data, RS = 1
+    RW = 0;             // RW is always grounded
+    EN = 1;             // Send the data now
+    __delay_ms(Delay_LCD); // Wait for line to stabilize
+    EN = 0;             // Ready, all sent 
+}
+
+void Message_LCD(unsigned char *s) {
+    while(*s) {
+        Lcd_DataWrite((unsigned char) *s++);
+    }
+}
+
+// Initialize LCD to position cursor and display correctly
+void Init_LCD() {
+    //__delay_ms(100);
+    Lcd_CmdWrite(TwoLines57Mat);
+    //__delay_ms(100); 
+    Lcd_CmdWrite(DispONCurOFF);
+    //__delay_ms(100); 
+    Lcd_CmdWrite(ClrScreen);
+    //__delay_ms(100); 
+    Lcd_CmdWrite(FirstLine);
+    //__delay_ms(100); 
+}
+
+void Shift_Characters() {
+    for(int i = 0; i < 25; i++) {
+        __delay_ms(Delay_Shift);
+        Lcd_CmdWrite(ShiftDispLeft);
+    }
+}
+
+int Position_Lcd_Cursor(int LineNum, int Offset) {
+    int PosVal;
+    if(LineNum == 1) {
+        PosVal = FirstLine + Offset;
+    } else {
+        PosVal = SecondLine + Offset;
+    }
+    return PosVal;
+}
 
 void config_Usart() {
     BRGH = 0;                     // Low speed or high speed serial
@@ -139,10 +224,21 @@ void RFID_read() {
     }
 }
 
+void enable_interrupts(){
+    //Interrupt assigned to RB1
+    INTCON2bits.INTEDG1= 1;
+    INTCON3bits.INT1IF = 0;
+    INTCON3bits.INT1IE = 1;
+    GIE = 1;
+}
+void __interrupt() anomaly(){
+    
+}
 
 void main() {
-    config_Usart();               // Configura USART antes de enviar datos
-    char string[] = "Hola";      // Intento de mandar 'hola' por TX
+    Lcd_CmdWrite(ClrScreen);
+    Lcd_CmdWrite(FirstLine);
+    Message_LCD("Welcome");
     int i;
     for (i = 0; i < 4; i++) {
         Tx_byte(string[i]);
